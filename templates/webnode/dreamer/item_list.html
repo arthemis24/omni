@@ -1,0 +1,93 @@
+{% extends 'webnode/dreamer/base.html' %}
+{% load static auth_tokens %}
+{% block meta %}
+    {{ block.super }}
+    {% include 'webnode/snippets/item_list_seo.html' %}
+{% endblock %}
+{% block page_title %}
+    <title>
+        {% if smart_category.title %}
+            {{ smart_category.title }} - {{ service.project_name }}
+        {% else %}
+            {{ category.name }} - {{ service.project_name }}
+        {% endif %}
+    </title>
+{% endblock %}
+
+{% block seo %}
+    <div class="hidden seo">
+        <h1>{{ smart_category.title }}</h1>
+        <p>{{ smart_category.description }}</p>
+    </div>
+{% endblock %}
+{% block head_style %}
+    {{ block.super }}
+    <style>
+        .header-top {position: absolute; top:0; width: 100%}
+        .header-bottom {background: #ffffff;height: 75px; margin-top: 40px}
+        .navbar-nav>li>a {color: #747474;}
+        .page-banner {float: left; margin-top: 40px}
+        .center {text-align: center;padding-bottom: 0;margin-top: 105px;}
+    </style>
+{% endblock %}
+{% block content %}
+<section id="feature" class="transparent-bg">
+    <div class="container">
+        <div class="center wow fadeInDown">
+            {% if smart_category.title %}
+                <h2>{{ smart_category.title }}</h2>
+            {% else %}
+                <h2>{{ category.name }}</h2>
+            {% endif %}
+            <p class="lead"></p>
+        </div>
+        <div class="row">
+            {% for item in  item_list %}
+            <div class="features">
+            {% if activate_block_title %}
+                <h2 style="margin-left: 12px; padding-bottom: 15px">{{ item.category.name }}</h2>
+            {% endif %}
+            {% for row in  item.items %}
+                <div class="clear-row">
+                    {% for product in  row %}
+                        {% if config.theme.display == 'Comfortable' %}
+                            <div class="col-sm-6 wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="600ms">
+                                <div class="feature-wrap subtle-shade">
+                                    <a href="{% url 'webnode:product_details' product.category.slug product.slug %}">
+                                        <div class="item-list-img" style="background-image: url('{{ product.get_photos_url_list.0.small }}'); height: 380px"></div>
+                                    </a>
+                        {% elif config.theme.display == 'Cozy'  %}
+                            <div class="col-sm-4 wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="600ms">
+                                <div class="feature-wrap subtle-shade">
+                                    <a href="{% url 'webnode:product_details' product.category.slug product.slug %}">
+                                        <div class="item-list-img" style="background-image: url('{{ product.get_photos_url_list.0.small }}'); height: 240px"></div>
+                                    </a>
+                        {% else %}
+                            <div class="col-sm-3 wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="600ms">
+                                <div class="feature-wrap subtle-shade">
+                                    <a href="{% url 'webnode:product_details' product.category.slug product.slug %}">
+                                        <div class="item-list-img" style="background-image: url('{{ product.get_photos_url_list.0.small }}'); height: 200px"></div>
+                                    </a>
+                        {% endif %}
+                                <a href="{% url 'webnode:product_details'  product.category.slug product.slug %}"><h2>{{ product.name }}</h2></a>
+                                <h3>{{ product.summary | safe }}</h3>
+                            </div>
+                        </div><!--/.col-md-4-->
+                    {% endfor %}
+                </div>
+            {% endfor %}
+            </div><!--/.services-->
+            {% endfor %}
+        </div><!--/.row-->
+    </div><!--/.container-->
+</section><!--/#feature-->
+{% endblock %}
+{% block js %}
+    {{ block.super }}
+    <script type="text/javascript">
+        (function() {
+            $('ul.navbar-nav li').removeClass('active')
+            $('ul.navbar-nav li.{{ smart_category.slug }}').addClass('active')
+        })()
+    </script>
+{% endblock %}

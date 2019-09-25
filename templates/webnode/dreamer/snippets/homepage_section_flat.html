@@ -1,0 +1,62 @@
+{% load i18n static %}
+    {% if section.background_image %}
+        <section class="full-bg-section feature h-section home-section bg-img-{{ section.background_image|lower }} text-{{ section.text_position|lower }}" style="background-image: url({% get_media_prefix %}{{ section.image.name }})">
+            <div class="col-md-5 col-md-offset-6 bg-text">
+                {% if section.title %}
+                    <div class="center wow fadeInDown">
+                        <a href="{{ section.target_url }}"><h2 class="title full-bg text-{{ section.text_position|lower }}" style="color: #4e4e4e;">{{ section.title }}</h2></a>
+                    </div>
+                {% endif %}
+                <div class="row">
+                    <div class="features home-section-text-{{ section.text_position|lower }} wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="600ms">
+                        {% if section.image.name and not section.background_image %}
+                            <div class="img col-xs-12 col-sm-6 col-md-5 wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="600ms">
+                                <img src="{% get_media_prefix %}{{ section.image.name }}" alt="{{ section.title }}" />
+                            </div>
+                        {% endif %}
+                        <div class="description col-xs-12 wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="600ms" style="color: #4e4e4e;">
+                            {% if section.description %}
+                                <div>{{ section.description|safe }}</div>
+                            {% endif %}
+                            {% if section.cta %}
+                                <div class="home-section-cta">
+                                    <a href="{{ section.target_url }}" class="cta">{{ section.cta }}</a>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="clearfix"></div>
+        </section>
+    {% else %}
+        <section class="feature h-section home-section bg-img-{{ section.background_image|lower }} text-{{ section.text_position|lower }}">
+            <div class="container">
+                {% if section.title %}
+                    <div class="center wow fadeInDown">
+                        <a href="{{ section.target_url }}"><h2 class="title text-{{ section.text_position|lower }}">{{ section.title }}</h2></a>
+                    </div>
+                {% endif %}
+                <div class="row">
+                    <div class="features home-section-text-{{ section.text_position|lower }} wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="600ms">
+                        {% if section.image.name and not section.background_image %}
+                            <div class="img col-xs-12 col-sm-6 col-md-5 wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="600ms">
+                                <img src="{% get_media_prefix %}{{ section.image.name }}" alt="{{ section.title }}" />
+                            </div>
+                        {% endif %}
+                        <div class="description col-sm-6 col-md-5 col-xs-12 wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="600ms">
+                            {% if section.description %}
+                                <div>{{ section.description|safe }}</div>
+                            {% endif %}
+                            {% if section.cta %}
+                                <div class="home-section-cta">
+                                    <a href="{{ section.target_url }}" class="cta">{{ section.cta }}</a>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="clearfix"></div>
+        </section>
+    {% endif %}

@@ -1,0 +1,36 @@
+{% extends 'webnode/dreamer/base.html' %}
+{% load static auth_tokens %}
+
+{% block page_title %}<title>{{ service.project_name }} - {{ page.title }}</title>{% endblock %}
+
+{% block head_style %}
+    {{ block.super }}
+    <style>
+        .navbar-inverse .navbar-nav > li > a {color: #2e2e2e;}
+        .flat-page-content {font-size: 20px; line-height: 35px; min-height: 600px; margin-top: 50px;}
+        .page-title {margin-top: 5em;}
+    </style>
+{% endblock %}
+
+{% block page_content %}
+    <section id="about-us">
+        <div class="container">
+			<div class="center wow fadeInDown">
+				<h2 class="page-title">{{ page.title }}</h2>
+			</div>
+            <div class="flat-page-content">
+                {{ page.content|safe }}
+            </div>
+		</div><!--/.container-->
+    </section><!--/about-us-->
+{% endblock %}
+{% block js %}
+    {{ block.super }}
+    <script type="text/javascript">
+        (function() {
+            $('ul.navbar-nav li').removeClass('active');
+            $('ul.navbar-nav li.about').addClass('active')
+            $('#bottom .container.fadeInDown').css('visibility', 'visible')
+        })()
+    </script>
+{% endblock %}

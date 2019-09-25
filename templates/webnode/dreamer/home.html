@@ -1,0 +1,164 @@
+{% extends 'webnode/dreamer/base.html' %}
+{% load i18n static user_agents humanize auth_tokens %}
+
+{% block meta %}
+    {{ block.super }}
+    {% include 'webnode/snippets/home_seo.html' %}
+{% endblock %}
+{% block page_title %}<title>{{ service.project_name }} - {% trans "Home" %}</title>{% endblock %}
+
+{% block head_style %}
+    {{ block.super }}
+    <style>
+    </style>
+{% endblock %}
+{% block seo %}
+    <div class="hidden seo">
+        <h1>{{ config.slogan}}</h1>
+        <p>{{ config.description }}</p>
+    </div>
+{% endblock %}
+{% block banner %}
+    <section class="fw-section banner">
+
+        <div class="slideshows">
+            <div class="swiper-container">
+                <!-- Additional required wrapper -->
+                <div class="swiper-wrapper">
+                    <!-- Slides -->
+
+                    {% for slide in slideshow %}
+                        <div class="swiper-slide">
+                        {% if slide.image.name %}
+                            <div class="">
+                                {% if request|is_mobile %}
+                                    <div class="slide mobile" style="background-image: url({% get_media_prefix %}{{ slide.image.name }})"></div>
+                                {% else %}
+                                    <div class="slide" style="background-image: url({% get_media_prefix %}{{ slide.image.name }})">
+                                        {% if slide.title %}
+                                            <h1 class="text-has-shade">{{ slide.title }}</h1>
+                                        {% endif %}
+
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+                <!-- If we need pagination -->
+                <div class="swiper-pagination"></div>
+
+                <!-- If we need navigation buttons -->
+                <div class="swiper-button-prev hidden-xs"></div>
+                <div class="swiper-button-next hidden-xs"></div>
+
+            </div>
+        </div>
+        <div id="left">
+            <section id="use-omni" class="actions-box">
+                <header><h1 style="font-size: 1.2em">Use JumboPay today</h1></header>
+                {% if request.user.is_authenticated %}
+                <form action="{% url 'omni:refill' %}">
+                {% else %}
+                <form action="{% url 'ikwen:sign_in' %}?next={% url 'omni:refill' %}">
+                {% endif%}
+                    <div class="form-group col-xs-10" style="margin-top: 0">
+                        <label>Refill Ecobank card</label>
+                        <input class="form-control input-sm"  type="text" placeholder="Amount">
+                    </div>
+                    <div class="col-sm-2 go"><input type="submit" class="btn btn-success" value="Go"></div>
+                </form>
+                <form action="https://www.jumbobus.cm/">
+                    <div class="form-group col-xs-10" style="margin-top: 0">
+                        <label for="amount-airtime">Buy your bus ticket</label>
+                        <select class="form-control form-control-custom">
+                            <option>MTN</option>
+                            <option>Orange</option>
+                            <option>Nexttel</option>
+                            <option>Camtel</option>
+                            <option>Yoomee</option>
+                            <option>Cyberlink</option>
+                        </select>
+                    </div>
+                    <div class="col-xs-2 go"><input type="submit" class="btn btn-success" value="Go"></div>
+                </form>
+                <form action="https://www.jumbobus.cm/">
+                    <div class="form-group col-xs-10" style="margin-top: 0">
+                        <label for="amount-airtime">Pay your bill or merchant</label>
+                        <select class="form-control form-control-custom">
+                            <option>ENEO</option>
+                            <option>Canal+</option>
+                            <option>TNT Africa</option>
+                            <option>DSTV</option>
+                            <option>Camtrack</option>
+                        </select>
+                    </div>
+
+                    <div class="col-xs-2 go"><input type="submit" class="btn btn-success" value="Go"></div>
+                </form>
+                <form action="https://www.jumbobus.cm/">
+                    <div class="form-group col-xs-10" style="margin-top: 0">
+                        <label for="amount-airtime">Buy your plane or train ticket</label>
+                        <select class="form-control form-control-custom">
+                            <option>CamairCo</option>
+                            <option>Camrail</option>
+                        </select>
+                    </div>
+
+                    <div class="col-xs-2 go"><input type="submit" class="btn btn-success" value="Go"></div>
+                </form>
+                <div class="clear"></div>
+            </section>
+            <div id="download-android" class="actions-box" style="clear: both; float: left; height: 90px; margin-top: 24px; padding: 15px; width: 300px">
+                <img src="/static/webnode/img/Google-Play-Store-Logo.jpg" height="60" style="float: left">
+                <section style="float: right; width: 204px">
+                    <header style="font-weight: bold">Download Omni for Android</header>
+                    <p style="font-size: 11px">Click on the Google Play Store icon to download JumboPay to your phone.</p>
+                    <div class="clear"></div>
+                </section>
+            </div>
+            <ul id="social" style="float: left; clear: both">
+            </ul>
+        </div>
+    </section>
+{% endblock %}
+{% block content %}
+    {% for section in homepage_section_list %}
+        {{ section.render|safe }}
+    {% endfor %}
+{% endblock %}
+
+{% block js %}
+    {{ block.super }}
+    <script type="text/javascript">
+        (function() {
+            var mySwiper = new Swiper ('.swiper-container', {
+                // Optional parameters
+                direction: 'horizontal',
+                loop: false,
+
+                // If we need pagination
+                pagination: {
+                el: '.swiper-pagination',
+                },
+
+                // Navigation arrows
+                navigation: {
+                nextEl: '.swiper-button-next',
+                prevEl: '.swiper-button-prev',
+                },
+                autoplay: 5000
+            })
+
+            $('.swiper-container').on('mouseenter', function(e){
+                console.log('stop autoplay');
+                mySwiper.stopAutoplay();
+            })
+             $('.swiper-container').on('mouseleave', function(e){
+                console.log('start autoplay');
+                mySwiper.startAutoplay();
+            })
+        })()
+    </script>
+{% endblock %}

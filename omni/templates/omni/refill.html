@@ -1,0 +1,200 @@
+{% extends 'webnode/dreamer/base.html' %}
+{% load i18n static user_agents humanize auth_tokens %}
+
+{% block meta %}
+    {{ block.super }}
+    {% include 'webnode/snippets/home_seo.html' %}
+{% endblock %}
+{% block page_title %}<title>{{ service.project_name }} - {% trans "Refill" %}</title>{% endblock %}
+
+{% block head_style %}
+    {{ block.super }}
+    <link rel="stylesheet" type="text/css" href="{% static 'ikwen/css/base.css' %}"/>
+    <style>
+        .danger {color: #cb0009}
+        .valid-feedback {display: none}
+        #content {padding: 55px 0 0;}
+        #content.form {padding-top: 15%;}
+        #content.form > div {margin: auto}
+        #content.form .directions {font-size: 16px; margin-top: 90px; text-align: center}
+        #content.form form {border: 2px solid #dce4ec;border-radius: 4px;margin-top: 25px;padding: 30px;}
+        #content form .hint {color: #8D96C5; font-size: 14px}
+        #content form ul.errorlist {padding-left: 0}
+        #content form ul.errorlist li {color: #FF0808; list-style-type: none}
+        .event-icon {line-height: 104px}
+        #login{border: 1px solid #ddd; display: block; margin: 120px auto; padding: 30px 24px 15px; width: 400px;}
+
+        #pending-invoices {margin-top: 10px;}
+        .v-align { display: flex; align-items: center; justify-content: flex-start }
+        .v-align-center { align-self: center; }
+        .event-icon {height: 60%}
+        .due-date.pending .event-title {color: #888}
+        .due-date.overdue .event-title, .due-date.exceeded .event-title {color: #d31b00}
+        .btn {padding: 10px 12px}
+        @media (min-width: 768px) {
+            #pending-invoices {margin-top: 30px;}
+        }
+        @media (max-width: 767px) {
+            #pending-invoices .payment-start {margin-top: 10px;}
+            #login {width: 100%}
+        }
+
+    </style>
+{% endblock %}
+{% block seo %}
+    <div class="hidden seo">
+        <h1>{{ config.slogan}}</h1>
+        <p>{{ config.description }}</p>
+    </div>
+{% endblock %}
+{% block content %}
+    <div id="content" class="form container">
+        {% if login_form.errors %}
+            <p class="failure" style="font-size: 1em; padding: 9px">{{ error_message }}</p>
+        {% elif request.GET.msg %}
+            <p class="failure" style="font-size: 1em; padding: 9px">{{ request.GET.msg }}</p>
+        {% endif %}
+        {% if messages %}
+            {% for msg in messages %}<p class="msg-tag {{ msg.tags }}" style="font-size: 1em; padding: 9px">{{ msg }}</p>{% endfor %}
+        {% endif %}
+        <div id="login" class="form-wrapper roow">
+            <h3 style="text-align: center">
+                <div style="margin-bottom: .3em; text-align: center">
+                    {% if config.logo.name %}
+                        <img src="{{ settings.IKWEN_MEDIA_URL }}{{ config.logo.name }}" alt="Logo {{ service.project_name }}"
+                             style="max-height: 80px"/>
+                    {% endif %}
+                </div>
+                {% trans "Refill your card" %}
+            </h3>
+{#            <!--<div action="{% url 'omni:refill' %}" method="post">{% csrf_token %}-->#}
+            <div>
+                <input type="hidden" id="next" name="next">
+                <div class="form-group card-number" style="margin-top: .4em">
+                    <label for="lg-card-number">{% trans "Customer ID" %}</label>
+                    <input id="lg-card-number" class="form-control input-lg card-number" type="text" name="card_number" autofocus  required="true"
+                           value="{{ request.GET.card_number }}{{ request.GET.card_number }}" />
+                    <div class="valid-feedback danger">Please Enter your card number! </div>
+                </div>
+                <div class="form-group last-digit" style="margin-top: .4em">
+                    <label for="lg-last-digit">{% trans "Last 4 digits" %}</label>
+                    <input id="lg-last-digit" class="form-control input-lg lg-last-digit" type="text" name="last_digit" maxlength="4" autofocus />
+                    <div class="valid-feedback danger">Please Enter the last 4digits of card number! </div>
+                </div>
+                <div class="form-group amount">
+                    <label for="lg-amount">{% trans "Amount" %}</label>
+                    <input id="lg-amount" class="form-control input-lg amount" type="number" name="amount" />
+                    <div class="valid-feedback danger">Please Enter an amount! </div>
+                </div>
+                <div class="form-group">
+                    <button id="refill-now" class="btn btn-success btn-block btn-lg"> {% trans "Submit" %} </button>
+                </div>
+            </div>
+        </div>
+        <div class="clear"></div>
+    </div>
+    <div id="content" class="container">
+        <div class="col-sm-8 col-sm-offset-2">
+            <h3>
+                <strong>{% trans "Latest refills" %}</strong>
+            </h3>
+            <div id="pending-invoices">
+                {% with refill_count=refill_list|length %}
+                    <h4 style="margin-bottom: 20px">{{ refill_count }} Refill(s)</h4>
+                {% endwith %}
+                {% for invoice in refill_list %}
+                    {% url 'billing:invoice_detail' invoice.id as invoice_url %}
+                    <div class="event">
+                        <div class="subtle-shade event-detail">
+                            <div class="event-icon pull-left">
+                                <img src="{% static 'ikwen/img/invoice-icon.png' %}" />
+                            </div>
+                            <div class="event-content">
+                                <div>
+                                    <div class="col-sm-6 row" style="font-size: 1.2em">{{ invoice }}</div>
+                                    <div class="col-sm-4 event-date text-muted pull-right text-right hidden-xs" style="padding-right: 0;">{{ invoice.created_on|date }}</div>
+                                    <div class="clearfix"></div>
+                                </div>
+                                <h3>
+                                    <strong>{{ invoice.amount|intcomma }}</strong>
+                                    <span class="text-muted" style="font-size: .6em">{{ currency_symbol }}</span>
+                                </h3>
+                                <div class="clearfix"></div>
+                            </div>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="clearfix"></div>
+                    </div>
+                {% endfor %}
+            </div>
+            <div id="results" style="padding-top: 0">
+                {% include 'billing/snippets/invoice_list_results.html' %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+    {{ block.super }}
+    <script type="text/javascript">
+        (function() {
+            function checkInputs() {
+
+                var amount  = $('#lg-amount').val(),
+                 cardNumber = $('#lg-card-number').val(),
+                 lastDigit = $('#lg-last-digit').val();
+                var errors = 0;
+                if (cardNumber === ''){
+                    $('div.card-number').find('.valid-feedback').fadeIn().show()
+                    errors += 1
+                }
+                if (lastDigit === ''){
+                    $('div.last-digit').find('.valid-feedback').fadeIn().show()
+                    errors += 1
+                }
+
+                if (amount <= 0){
+                    $('div.amount').find('.valid-feedback').fadeIn().show()
+                    errors += 1
+                }
+                return errors
+            }
+            $('#refill-now').click(function() {
+                var errors = checkInputs()
+                if (errors >0) return
+                var amount  = $('#lg-amount').val(),
+                 cardNumber = $('#lg-card-number').val(),
+                 lastDigit = $('#lg-last-digit').val();
+
+                var endpoint = "{% url 'omni:start_refill_process' %}";
+                var params = {format: 'json', card_number: cardNumber, last_digit:lastDigit, amount: amount}
+
+
+
+                $.getJSON(endpoint, params, function(data) {
+                    if (data.error) {
+                        $('div#top-notice-ctnr span').html(data.error).addClass('failure');
+                        $('#top-notice-ctnr').fadeIn().delay(5000).fadeOut();
+                    } else {
+                        var refillId = data.refill_id
+                        $('#payment-product-id').val(refillId);
+                        $('#payment-methods').modal('show');
+                    }
+                    return false
+                });
+
+
+            });
+
+            $('.payment-method').click(function() {
+                var actionURL = $(this).data('action-url');
+                $('form#checkout').attr('action', actionURL).submit();
+            });
+
+        })()
+    </script>
+
+    {% with payment_conf='refill' %}
+        {% include 'billing/snippets/modal_payment_options.html' %}
+    {% endwith %}
+{% endblock %}
